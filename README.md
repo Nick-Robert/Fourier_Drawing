@@ -46,15 +46,15 @@ where the approximated signal jumps in an ugly way through the A to the left sid
 
 ![2_tamu_fixed_ex](https://user-images.githubusercontent.com/77978140/146502484-7f10eef2-773b-4fc7-bf1e-2c536533867e.png)
 
-More complex signals can also be represented. For example, a picture of Reveille which contains 501 Fourier coefficients:
+More complex signals can also be represented. For example, a picture of Reveille which contains 500 Fourier coefficients:
 
 ![rev_500n_2500bins](https://user-images.githubusercontent.com/77978140/146502586-192fc70f-c996-4a96-9550-a06ea99bbf9a.png)
 
-However, the number of Fourier coefficients is not the only deciding variable for how accurate the approximation is. For example, if I try to reconstruct a picture of Reveille with 5001 Fourier coefficients but only 250 points on each SVG path, then this is the result: 
+However, the number of Fourier coefficients is not the only deciding variable for how accurate the approximation is. For example, if I try to reconstruct a picture of Reveille with 5000 Fourier coefficients but only 250 points on each SVG path, then this is the result: 
 
 ![rev_5000n_250bins](https://user-images.githubusercontent.com/77978140/146502893-c1fe9d87-2ec7-4e66-b07d-3a84caeba527.png)
 
-This is equivalent to this picture, which has 501 Fourier coefficients as the first but only 250 points (called n_bins in the code):
+This is equivalent to this picture, which has 500 Fourier coefficients as the first but only 250 points (called n_bins in the code):
 
 ![rev_500n_250bins](https://user-images.githubusercontent.com/77978140/146502991-201137aa-060a-4d18-beaa-a0ae21c82de6.png)
 
