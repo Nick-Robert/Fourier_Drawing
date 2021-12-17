@@ -22,6 +22,9 @@ def make_fourier_series(t, f_coeffs):
         outer_idx += 1
     return fourier_series
 
+
+# This function outputs the Fourier series coefficients given the FFT's results. The real and imaginary parts of the complex number are stored as a list
+# within a larger list of lists called fourier_coeffs
 def make_fs_coeffs(ncoeff, fft_vals):
     fourier_coeffs = []
     for n in range(0, ncoeff+1):
