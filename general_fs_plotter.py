@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from svg.path import parse_path
 from svg.path.path import Close
 from xml.dom import minidom
+import pathlib
 
 # Define a function to generate a Fourier series based on the coefficients determined by the Fast Fourier Transform.
 # This also includes a series of phases x to pass through the function.
@@ -40,13 +41,13 @@ def make_fs_coeffs(ncoeff, fft_vals):
 n_bins = 1500
 # number of Fourier coefficients
 # This affects how good an approximation the Fourier series is for the svg file
-n_coeffs = [5000]
+n_coeffs = [500]
 # for loop that was used to generate the slideshows in the readme
 # for num in range(1, 201):
 #     n_coeffs.append(num)
 
 # load in the svg file as a series of complex numbered points
-doc = minidom.parse('C:/Users/nickr/Documents/Programming/Visual_Studio/Fourier_Project/svg_files/homer2.svg')
+doc = minidom.parse(str(pathlib.Path(__name__).parent.absolute())+'\svg_files\\rev.svg')
 path_strings = [path.getAttribute('d') for path in doc.getElementsByTagName('path')]
 doc.unlink()
 
