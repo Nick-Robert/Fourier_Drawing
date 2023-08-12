@@ -35,68 +35,69 @@ def make_fs_coeffs(ncoeff, fft_vals):
     return np.array(fourier_coeffs)
 
 
-# define how many points on each path object will be taken
-# since each path's .point() method takes a value from 0.0 to 1.0, the number will be 1.0 / N
-# This affects how good an approximation the svg paths are (which also affects the Fourier approximation)
-n_bins = 1500
-# number of Fourier coefficients
-# This affects how good an approximation the Fourier series is for the svg file
-n_coeffs = [500]
-# for loop that was used to generate the slideshows in the readme
-# for num in range(1, 201):
-#     n_coeffs.append(num)
+if __name__ == "__main__":
+    # define how many points on each path object will be taken
+    # since each path's .point() method takes a value from 0.0 to 1.0, the number will be 1.0 / N
+    # This affects how good an approximation the svg paths are (which also affects the Fourier approximation)
+    n_bins = 1500
+    # number of Fourier coefficients
+    # This affects how good an approximation the Fourier series is for the svg file
+    n_coeffs = [500]
+    # for loop that was used to generate the slideshows in the readme
+    # for num in range(1, 201):
+    #     n_coeffs.append(num)
 
-# load in the svg file as a series of complex numbered points
-doc = minidom.parse(str(pathlib.Path(__name__).parent.absolute())+'\svg_files\\rev.svg')
-path_strings = [path.getAttribute('d') for path in doc.getElementsByTagName('path')]
-doc.unlink()
+    # load in the svg file as a series of complex numbered points
+    doc = minidom.parse(str(pathlib.Path(__name__).parent.absolute())+'\svg_files\\rev.svg')
+    path_strings = [path.getAttribute('d') for path in doc.getElementsByTagName('path')]
+    doc.unlink()
 
-pic_points = []
-for path_string in path_strings:
-    path = parse_path(path_string)
-    for e in path:
-        if not isinstance(e, Close):
-            time_num = 0
-            while (time_num <= 1.0):
-                pic_points.append(e.point(time_num))
-                time_num += (1.0/n_bins)
-# ensures that the x and y values are between 0 and 1
-scale = 0
-for val in pic_points:
-    if (val.real > scale):
-        scale = val.real + 1
-    elif (val.imag > scale):
-        scale = val.imag + 1
-# defines the x-axis
-x = np.array([i.real / scale for i in pic_points])
-# defines the y-axis
-y = np.array([i.imag / scale for i in pic_points])
-# defines the time axis
-t = np.linspace(0, 1, n_bins)
+    pic_points = []
+    for path_string in path_strings:
+        path = parse_path(path_string)
+        for e in path:
+            if not isinstance(e, Close):
+                time_num = 0
+                while (time_num <= 1.0):
+                    pic_points.append(e.point(time_num))
+                    time_num += (1.0/n_bins)
+    # ensures that the x and y values are between 0 and 1
+    scale = 0
+    for val in pic_points:
+        if (val.real > scale):
+            scale = val.real + 1
+        elif (val.imag > scale):
+            scale = val.imag + 1
+    # defines the x-axis
+    x = np.array([i.real / scale for i in pic_points])
+    # defines the y-axis
+    y = np.array([i.imag / scale for i in pic_points])
+    # defines the time axis
+    t = np.linspace(0, 1, n_bins)
 
-for n_coeff in n_coeffs:
-    # initialize the plot
-    fig, axs = plt.subplots(1, 1, figsize=(12, 12))
-    fig.suptitle('n = ' + str(n_coeff))
+    for n_coeff in n_coeffs:
+        # initialize the plot
+        fig, axs = plt.subplots(1, 1, figsize=(12, 12))
+        fig.suptitle('n = ' + str(n_coeff))
 
-    # FFT for the x and y values
-    fast_fourier_transform_x = np.fft.fft(x)
-    fast_fourier_transform_y = np.fft.fft(y)
+        # FFT for the x and y values
+        fast_fourier_transform_x = np.fft.fft(x)
+        fast_fourier_transform_y = np.fft.fft(y)
 
-    # Calculate the corresponding Fourier series coefficients from the FFT
-    f_coeffs_x = make_fs_coeffs(n_coeff, fast_fourier_transform_x)
-    f_coeffs_y = make_fs_coeffs(n_coeff, fast_fourier_transform_y)
+        # Calculate the corresponding Fourier series coefficients from the FFT
+        f_coeffs_x = make_fs_coeffs(n_coeff, fast_fourier_transform_x)
+        f_coeffs_y = make_fs_coeffs(n_coeff, fast_fourier_transform_y)
 
-    # Create the Fourier series approximating this data
-    fourier_series_x = make_fourier_series(t, f_coeffs_x)
-    fourier_series_y = make_fourier_series(t, f_coeffs_y)
+        # Create the Fourier series approximating this data
+        fourier_series_x = make_fourier_series(t, f_coeffs_x)
+        fourier_series_y = make_fourier_series(t, f_coeffs_y)
 
-    # Create a plot to view the data
-    axs.set_xlim(0, 1)
-    axs.set_ylim(0, 1)
-    axs.scatter(x, y, color="red", s=1)
-    axs.plot(fourier_series_x, fourier_series_y, color="blue", linewidth=1)
-    # if wanting to save a series of plots, then uncomment the next two lines and comment the plt.show()
-    # fig.savefig('C:/Users/nickr/Documents/Programming/Visual_Studio/Fourier_Project/succulent_ss/'+str(n_coeff))
-    # plt.close()
-    plt.show()
+        # Create a plot to view the data
+        axs.set_xlim(0, 1)
+        axs.set_ylim(0, 1)
+        axs.scatter(x, y, color="red", s=1)
+        axs.plot(fourier_series_x, fourier_series_y, color="blue", linewidth=1)
+        # if wanting to save a series of plots, then uncomment the next two lines and comment the plt.show()
+        # fig.savefig('C:/Users/nickr/Documents/Programming/Visual_Studio/Fourier_Project/succulent_ss/'+str(n_coeff))
+        # plt.close()
+        plt.show()

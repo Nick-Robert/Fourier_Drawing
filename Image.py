@@ -7,6 +7,7 @@ from bisect import bisect
 from scipy.spatial.distance import cdist
 from collections import defaultdict
 
+
 class Image(object):
     def __init__(self, img_loc, shape = None):
         self.img = cv2.imread(img_loc)
@@ -17,14 +18,14 @@ class Image(object):
         print("Shape of this image is:", self.img.shape)
 
     def sort(self):
-        contours = self.find_contours()
+        contours = self._find_contours()
         return np.vstack([contours[idx][start::-1] if start is None and end is None and stride == -1
                                                    else contours[idx] if start is None and end is None and stride == 1
                                                    else contours[idx][:end:-1] if start is None and end is not None and stride == -1
                                                    else contours[idx][start:end:stride] 
-                        for idx, (start, end, stride) in self.find_order(contours)])
+                        for idx, (start, end, stride) in self._find_order(contours)])
     
-    def find_contours(self):
+    def _find_contours(self):
 #       img = cv2.GaussianBlur(self.img, (5,5), 0)
         edges = cv2.Canny(self.img, 100, 255)
         ret, thresh = cv2.threshold(edges, 127, 255, 0)
@@ -32,13 +33,13 @@ class Image(object):
 
         return contours
 
-    def find_order(self, contours):
+    def _find_order(self, contours):
         # This function was written as recursive originally.
         # This function obtains a dictionary of connections from find_paths(contours)
         # and "recursively" goes through the dictionary to find the slice notations that connects all contours together.
         order = []
         stack = [(0, 0, 0)]
-        paths = self.find_paths(contours)
+        paths = self._find_paths(contours)
 
         while stack:
             cur_contour, cur_pos, original_pos = stack.pop(-1)
@@ -62,7 +63,7 @@ class Image(object):
 
         return order
 
-    def find_paths(self, contours):
+    def _find_paths(self, contours):
         # This function first gets a distance matrix from cdist(points, points)
         # Then consider a "blob" that contains contours[0] (all the points of contours[0])
         # This function then uses that distance matrix to find the closest point to blob
@@ -100,11 +101,11 @@ class Image(object):
 
             # row_min[col_min] gives the row min of temp_dist
             temp_row, temp_col = row_min[col_min], col_min
-            temp_cur_contour = self.find_contour_index(temp_row, temp_start_end)
+            temp_cur_contour = self._find_contour_index(temp_row, temp_start_end)
             cur_contour  = temp_order[temp_cur_contour]
             # express row in terms of the index inside contours[cur_contour]
             row = temp_row - temp_start_end[temp_cur_contour][0]
-            next_contour = self.find_contour_index(temp_col, start_end)
+            next_contour = self._find_contour_index(temp_col, start_end)
             col = temp_col - start_end[next_contour][0]
 
             paths[cur_contour].append((next_contour, (row, col)))
@@ -125,17 +126,9 @@ class Image(object):
             paths[contour].sort(key = lambda x: x[1][0])
         return paths
 
-    def find_contour_index(self, idx, start_end):
+    def _find_contour_index(self, idx, start_end):
         for i, (start, end) in enumerate(start_end):
             if start <= idx < end:
                 return i
         return len(start_end) - 1
     
-    def __init__(self, image, shape=None):
-        # import image into numpy array
-        self.img = cv2.imread(image)
-        if shape:
-            self.img = cv2.resize(self.img, shape)
-    
-    def print(self):
-        print("Shape of this image is:", self.img.shape)
